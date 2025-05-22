@@ -14,10 +14,6 @@ export default class SaveTaskUseCase implements UseCase<Promise<Task>, [dto: Sav
     * @todo IMPLEMENT HERE : VALIDATION DTO, DATA SAVING, ERROR CATCHING
      */
     try {
-      const { id, name } = dto
-
-      if (!id && !name) return null;
-      
       return this.taskRepository.save(dto);
     } catch (error) {
       throw new BadRequestException(error.message);

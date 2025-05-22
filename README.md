@@ -37,16 +37,18 @@ return this.prisma.task.update({
 ```
 
 ## TODO : SaveTaskUseCase
-Enfin, il est nécessaire d'implémenter le *provider* qui gère tout ça. Toujours par comparaison avec les autres *provider* et à nouveau par analyse de l'interface UseCase, on comprend qu'il faut retourner la réponse de la base de donnée sans distinction entre le cas **create** et le cas **update**. La seule subtilité est qu'on demande de valider les données avant. Puisqu'on s'attend à trouver un objet de type `Task`, on vérifie que l'objet contienne au moins un attribut `name` ou un attribut `id`, sinon l'interaction avec la database ne sert à rien. L'implémentation est donc :
+Enfin, il est nécessaire d'implémenter le *provider* qui gère tout ça. Toujours par comparaison avec les autres *provider* et à nouveau par analyse de l'interface UseCase, on comprend qu'il faut retourner la réponse de la base de donnée sans distinction entre le cas **create** et le cas **update**. Il est demandé de valider les données. Cependant, la vérification de l'`id` se fait déjà dans la fonction `save(dto)` et le frontend est pensé pour d'abord créer une tâche vide puis lui donner un nom en la modifiant. Ainsi, il n'est pas nécessaire de vérifier que l'objet reçu `dto` contient au moins un des attributs `id` ou `name`. On peut laisser l'erreur se propager. L'implémentation est donc :
 
 ```ts
 try {
-  const { id, name } = dto
-
-  if (!id && !name) return null;
-  
   return this.taskRepository.save(dto);
 } catch (error) {
   throw new BadRequestException(error.message);
 }
+```
+
+Il fallait également ajouter le repository au *provider* :
+
+```ts
+constructor(private readonly taskRepository: TaskRepository) {}
 ```
